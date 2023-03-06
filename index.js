@@ -12,7 +12,8 @@ const write = (req, res, ...data) => {
   );
 };
 
-const server = http.createServer((req, res) => {
+const server = http
+  .createServer((req, res) => {
     const now = new Date();
     console.info(`[${now}] Requested by ${req.socket.remoteAddress}`);
     res.writeHead(200, {
@@ -31,6 +32,7 @@ const server = http.createServer((req, res) => {
           bread: 'パン',
           pizza: 'ピザ',
         };
+
         if (req.url === '/enquetes/yaki-shabu') {
           write(req, res, firstItems.yakiniku, secondItems.shabu);
         } else if (req.url === '/enquetes/rice-bread') {
@@ -43,26 +45,30 @@ const server = http.createServer((req, res) => {
       case 'POST':
         let rawData = '';
 
-        req.on('data', chunk => {
-          rawData = rawData + chunk;
-        }).on('end', () => {
-          const answer = new URLSearchParams(rawData);
-          const body = `${answer.get('name')}さんは${answer.get('favorite')}に投票しました`;
-          const html = `<!DOCTYPE html>
+        req
+          .on('data', chunk => {
+            rawData += chunk;
+          })
+          .on('end', () => {
+            const answer = new URLSearchParams(rawData);
+            const body = `${answer.get('name')}さんは${answer.get('favorite')}に投票しました`;
+            const html = `<!DOCTYPE html>
             <html lang="ja">
             <body><h1>${body}</h1></body>
             </html>`;
-          console.info(`[${now}] ${body}`);
-          res.write(html);
-          res.end();
-        });
+            console.info(`[${now}] ${body}`);
+            res.write(html);
+            res.end();
+          });
         break;
       default:
         break;
     }
-  }).on('error', e => {
+  })
+  .on('error', e => {
     console.error(`[${new Date()}] Server Error`, e);
-  }).on('clientError', e => {
+  })
+  .on('clientError', e => {
     console.error(`[${new Date()}] Client Error`, e);
   });
 const port = 8000;
